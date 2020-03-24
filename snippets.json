@@ -1,0 +1,323 @@
+{
+    "8bit" : {
+        "prefix" : ".8BIT",
+        "body" : [
+            ".8BIT",
+            "$0"
+        ],
+        "description" : "Use 8-bit instruction operands."
+    },
+    "16bit" : {
+        "prefix" : ".16BIT",
+        "body" : [
+            ".16BIT",
+            "$0"
+        ],
+        "description" : "Use 16-bit instruction operands"
+    },
+    "24bit" : {
+        "prefix" : ".24BIT",
+        "body" : [
+            ".24BIT",
+            "$0"
+        ],
+        "description" : "Use 24-bit instruction operands."
+    },
+    "accu" : {
+        "prefix" : ".ACCU",
+        "body" : [
+            ".ACCU\t${1|8,16|}",
+            "$0"
+        ],
+        "description" : "Set accumulator size (8/16-bit)."
+    },
+    "index" : {
+        "prefix" : ".INDEX",
+        "body" : [
+            ".INDEX\t${1|8,16|}",
+            "$0"
+        ],
+        "description" : "Set index-register size (8/16-bit)."
+    },
+    "asm" : {
+        "prefix" : ".ASM",
+        "body" : [
+            ".ENDASM",
+            "$TM_SELECTED_TEXT$0",
+            ".ASM"
+        ],
+        "description" : ".ENDASM: stop assembling, .ASM: begin assembling."
+    },
+    "dbrnd" : {
+        "prefix" : ".DBRND",
+        "body" : [
+            ".DBRND\t${1:quantity}, ${2:min}, ${3:max}",
+            "$0"
+        ],
+        "description": "Insert random bytes."
+    },
+    "dwrnd" : {
+        "prefix" : ".DWRND",
+        "body" : [
+            ".DWRND\t${1:quantity}, ${2:min}, ${3:max}",
+            "$0"
+        ],
+        "description": "Insert random words."
+    },
+    "dbcos" : {
+        "prefix" : ".DBCOS",
+        "body" : [
+            ".DBCOS\t${1:angle}, ${2:quantity}, ${3:step}, ${4:scale}, ${5:offset}",
+            "$0"
+        ],
+        "description": "Insert cosine bytes."
+    },
+    "dbsin" : {
+        "prefix" : ".DBSIN",
+        "body" : [
+            ".DBSIN\t${1:angle}, ${2:quantity}, ${3:step}, ${4:scale}, ${5:offset}",
+            "$0"
+        ],
+        "description": "Insert sine bytes."
+    },
+    "dwcos" : {
+        "prefix" : ".DWCOS",
+        "body" : [
+            ".DWCOS\t${1:angle}, ${2:quantity}, ${3:step}, ${4:scale}, ${5:offset}",
+            "$0"
+        ],
+        "description": "Insert cosine words."
+    },
+    "dwsin" : {
+        "prefix" : ".DWSIN",
+        "body" : [
+            ".DWSIN\t${1:angle}, ${2:quantity}, ${3:step}, ${4:scale}, ${5:offset}",
+            "$0"
+        ],
+        "description": "Insert sine words."
+    },
+    "name" : {
+        "prefix" : ".NAME",
+        "body" : [
+            ".NAME\t\"${1:name}\"",
+            "$0"
+        ],
+        "description" : "Name of the ROM (SNES)."
+    },
+    "rombanks" : {
+        "prefix" : ".ROMBANKS",
+        "body" : [
+            ".ROMBANKS\t${1|$00,$01,$02,$03,$04,$05,$06,$07|}",
+            "$0"
+        ],
+        "description" : "Indicator of ROM size (GameBoy)."
+    },
+    "ramsize" : {
+        "prefix" : ".RAMSIZE",
+        "body" : [
+            ".RAMSIZE\t${1|$00,$01,$02,$03|}",
+            "$0"
+        ],
+        "description" : "Indicator of save RAM size (GameBoy)."
+    },
+    "emptyfill" : {
+        "prefix" : ".EMPTYFILL",
+        "body" : [
+            ".EMPTYFILL\t\\$${1:byte}",
+            "$0"
+        ],
+        "description" : "Byte value to fill unused ROM space with."
+    },
+    "cartridgetype" : {
+        "prefix" : ".CARTRIDGETYPE",
+        "body" : [
+            ".CARTRIDGETYPE\t${1|$00,$01,$02,$03,$05,$06,$08,$09,$0B,$0C,$0D,$0F,$10,$11,$12,$13,$15,$16,$17,$19,$1A,$1B,$1C,$1D,$1E,$FC,$FD,$FE,$FF|}",
+            "$0"
+        ],
+        "description" : "Indicator of cartridge type (GameBoy)."
+    },
+    "countrycode" : {
+        "prefix" : ".COUNTRYCODE",
+        "body" : [
+            ".COUNTRYCODE\t${1|$00,$01|}",
+            "$0"
+        ],
+        "description" : "Indicator of country code (GameBoy)."
+    },
+    "nintendologo" : {
+        "prefix" : ".NINTENDOLOGO",
+        "body" : [
+            ".NINTENDOLOGO",
+            "$0"
+        ],
+        "description" : "Insert Nintendo logo into ROM (GameBoy)."
+    },
+    "gbheader" : {
+        "prefix" : ".GBHEADER",
+        "body" : [
+            ".GBHEADER",
+            "\tNAME\t\t\"${1:name}\"",
+            "\tLICENSEECODEOLD\t\\$${2:licenseecode_old}",
+            "\tLICENSEECODENEW\t\"${3:licenseecode_new}\"",
+            "\tCARTRIDGETYPE\t${4|$00,$01,$02,$03,$05,$06,$08,$09,$0B,$0C,$0D,$0F,$10,$11,$12,$13,$15,$16,$17,$19,$1A,$1B,$1C,$1D,$1E,$FC,$FD,$FE,$FF|}",
+            "\tRAMSIZE\t\t${5|$00,$01,$02,$03|}",
+            "\tCOUNTRYCODE\t${6|$00,$01|}",
+            "\tNINTENDOLOGO",
+            "\t${7|ROMDMG,ROMGBC,ROMGBCONLY|}",
+            ".ENDGB",
+            "",
+            "$0"
+        ],
+        "description" : "Insert GameBoy ROM header."
+    },
+    "smsheader" : {
+        "prefix" : ".SMSHEADER",
+        "body" : [
+            ".SMSHEADER",
+            "\tPRODUCTCODE\t\\$${1:bcd_low}, \\$${2:bcd_high}, \\$${3:top_digit_nybble}",
+            "\tVERSION\t\t\\$${4:version_nybble}",
+            "\tREGIONCODE\t${5|3,4,5,6,7|}",
+            "\tRESERVEDSPACE\t${6|$00\\, $00,$ff\\, $ff,$20\\, $20|}",
+            ".ENDSMS",
+            "",
+            "$0"
+        ],
+        "description" : "Insert SEGA Master System Header."
+    },
+    "licenseecodeold" : {
+        "prefix" : ".LICENSEECODEOLD",
+        "body" : [
+            ".LICENSEECODEOLD\t\\$${1:licenseecode_old}",
+            "$0"
+        ],
+        "description" : "Licensee Code (old-style) for GameBoy header."
+    },
+    "licenseecodenew" : {
+        "prefix" : ".LICENSEECODENEW",
+        "body" : [
+            ".LICENSEECODENEW\t\"${1:licenseecode_new}\"",
+            "$0"
+        ],
+        "description" : "Licensee Code (new-style) for GameBoy header."
+    },
+    "computegbchecksum" : {
+        "prefix" : ".COMPUTEGBCHECKSUM",
+        "body" : [
+            ".COMPUTEGBCHECKSUM",
+            "$0"
+        ],
+        "description" : "Compute checksum for GameBoy ROM header."
+    },
+    "computesmschecksum" : {
+        "prefix" : ".COMPUTESMSCHECKSUM",
+        "body" : [
+            ".COMPUTESMSCHECKSUM",
+            "$0"
+        ],
+        "description" : "Compute checksum for SEGA Master System ROM header."
+    },
+    "computesneschecksum" : {
+        "prefix" : ".COMPUTESNESCHECKSUM",
+        "body" : [
+            ".COMPUTESNESCHECKSUM",
+            "$0"
+        ],
+        "description" : "Compute checksum for SNES ROM header."
+    },
+    "smstag" : {
+        "prefix" : ".SMSTAG",
+        "body" : [
+            ".SMSTAG",
+            "$0"
+        ],
+        "description" : "Inserts the SEGA Master System identifier tag \"TMR SEGA\"."
+    },
+    "sdsctag" : {
+        "prefix" : ".SDSCTAG",
+        "body" : [
+            ".SDSCTAG\t${1:version}, \"${2:name}\", \"${3:notes}\", \"${4:author}\"",
+            "$0"
+        ],
+        "description" : "Insert extended meta-data information for SEGA Master System ROM."
+    },
+    "computegbcomplementcheck" : {
+        "prefix" : ".COMPUTEGBCOMPLEMENTCHECK",
+        "body" : [
+            ".COMPUTEGBCOMPLEMENTCHECK",
+            "$0"
+        ],
+        "description" : "Compute the complement checksum in GameBoy ROM header."
+    },
+    "incdir" : {
+        "prefix" : ".INCDIR",
+        "body" : [
+            ".INCDIR\t\"${1:path}\"",
+            "$0"
+        ],
+        "description" : "Change the include directory."
+    },
+    "include" : {
+        "prefix" : ".INCLUDE",
+        "body" : [
+            ".INCLUDE\t\"${1:filepath}\"",
+            "$0"
+        ],
+        "description" : "Include another file."
+    },
+    "incbin" : {
+        "prefix" : ".INCBIN",
+        "body" : [
+            ".INCBIN\t\"${1:filepath}\" ${2:SWAP} ${3:SKIP ${4:bytes}} ${5:READ ${6:bytes}}",
+            "$0"
+        ],
+        "description" : "Include a binary file."
+    },
+    "input" : {
+        "prefix" : ".INPUT",
+        "body" : [
+            ".INPUT ${1:variable}",
+            "$0"
+        ],
+        "description" : "Get user input."
+    },
+    "background" : {
+        "prefix" : ".BACKGROUND",
+        "body" : [
+            ".BACKGROUND \"${1:filepath}\"",
+            "$0"
+        ],
+        "description" : ".BACKGROUND is useful if you wish to patch an existing ROM image with new code or data; it pre-fills the ROM with the given file. You can overwrite the data with OVERWRITE sections only, unless you first clear memory blocks with .UNBACKGROUND after which there’s room for other sections as well. Note that .BACKGROUND can be used only when compiling an object file."
+    },
+    "unbackground" : {
+        "prefix" : ".UNBACKGROUND",
+        "body" : [
+            ".UNBACKGROUND \\$${1:begin_addr} \\$${2:end_addr}",
+            "$0"
+        ],
+        "description" : "Frees a section of the background-ROM (.BACKGROUND) for use."
+    },
+    "fail" : {
+        "prefix" : ".FAIL",
+        "body" : [
+            ".FAIL",
+            "$0"
+        ],
+        "description" : "Abort assembly."
+    },
+    "fclose" : {
+        "prefix" : ".FCLOSE",
+        "body" : [
+            ".FCLOSE\t${1:file_handle}",
+            "$0"
+        ],
+        "description" : "Closes the given file handle (opened with .FOPEN)."
+    },
+    "fopen" : {
+        "prefix" : ".FOPEN",
+        "body" : [
+            ".FOPEN\t\"${1:filepath}\" ${2:file_handle}",
+            "$0"
+        ],
+        "description" : "Open a file and assign to the given file handle name."
+    }
+}

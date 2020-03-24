@@ -1,0 +1,75 @@
+{
+    "name": "wla-dx-vscode",
+    "publisher": "KrocCamen",
+    "author": {
+        "name": "Kroc Camen",
+        "email": "kroc@camendesign.com",
+        "url": "http://camendesign.com"
+    },
+    "displayName": "WLA-DX for VSCode",
+    "description": "VSCode language support for WLA-DX assembler; WLA DX - Yet Another GB-Z80/Z80/6502/65C02/65CE02/6510/65816/6800/6801/6809/8008/8080/HUC6280/SPC-700 Multi Platform Cross Assembler Package",
+    "version": "0.1.0",
+    "engines": {
+        "vscode": "^1.30.0"
+    },
+    "categories": [
+        "Programming Languages",
+        "Themes",
+        "Snippets"
+    ],
+    "keywords": [
+        "6502",
+        "assembler",
+        "assembly",
+        "Z80"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "wla-dx-asm",
+                "aliases": [
+                    "WLA-DX",
+                    "wla-dx-asm"
+                ],
+                "extensions": [
+                    ".wla",
+                    ".asm",
+                    ".s",
+                    ".a",
+                    ".i"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "wla-dx-asm",
+                "scopeName": "source.wla-dx-asm",
+                "path": "./syntaxes/wla-dx-asm.tmLanguage.json"
+            }
+        ],
+        "snippets": [
+            {
+                "language": "wla-dx-asm",
+                "path": "./snippets.json"
+            }
+        ],
+        "themes": [
+            {
+                "label": "WLA-DX Light",
+                "uiTheme": "vs",
+                "path": "./themes/wla-dx-light-color-theme.json"
+            },
+            {
+                "label": "WLA-DX Dark",
+                "uiTheme": "vs-dark",
+                "path": "./themes/wla-dx-dark-color-theme.json"
+            },
+            {
+                "label": "Visual Studio 2019",
+                "uiTheme": "vs",
+                "path": "./themes/visual-studio-2019-color-theme.json"
+            }
+        ]
+    }
+}

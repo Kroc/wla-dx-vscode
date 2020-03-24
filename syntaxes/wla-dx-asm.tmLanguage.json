@@ -1,0 +1,544 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "wla-dx-asm",
+	"patterns": [{
+		"include": "#asm"
+	},{
+		"name"	: "comment.block.disabled",
+		"begin"	: "^",
+		"end"	: "$"
+	}],
+	"fileTypes": [".wla", ".asm", ".s", ".a", ".i"],
+	"repository": {
+		"asm" : {
+			"patterns" : [{
+				"comment"	: "from beginning to end of document, or between .ASM/.ENDASM directives.",
+				"begin"		: "\\A|(?<=^|\\s)(?i)(\\.ASM)\\b",
+				"end"		: "\\z|(?<=^|\\s)(?i)(\\.ENDASM)\\b",
+				"captures": {
+					"1" : { "name" : "keyword.control.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"include"	: "#root"
+				}]
+			},{
+				"include"	: "#endasm"
+			}]
+		},
+		"endasm" : {
+			"patterns" : [{
+				"comment"	: "Outside of the source code, we default to 'comment' format.",
+				"name"		: "comment.block.disabled",
+				"begin"		: "(?<=^|\\s)(?i:\\.ENDASM)\\b",
+				"contentName" : "comment.block.disabled",
+				"end"		: "(?<=^|\\s)(?i:\\.ASM)\\b",
+				"patterns"	: [{
+					"comment"	: "We need to pair these recursively.",
+					"include"	: "#endasm"
+				}]
+			}]
+		},
+		"root" : {
+			"patterns": [{
+				"include" : "#keywords"
+			},{
+				"include" : "#mnemonics"
+			},{
+				"include" : "#exprs"
+			}]
+		},
+		"struct" : {
+			"patterns"	: [{
+				"name"	: "storage.type.wla-dx-asm",
+				"match" : "(?<=\\s)\\.?(?i:ADDR|BYTE|D(?:B|L|S[BLW]?|WB?)|FARADDR|INSTANCEOF|LONG|WORD)\\b"
+			},{
+				"name" 		: "constant",
+				"comment"	: "Constants are assumed to be all-caps.",
+				"match" 	: "(?<=^|\\W)([A-Z][A-Z0-9_]+)\\b"
+			},{
+				"match" 	: "(?<=^|\\s)(?i:([BW])|([A-Z_][A-Z0-9_]*))\\b",
+				"captures" 	: {
+					"1" 	: { "name" : "invalid.illegal"},
+					"2" 	: { "name" : "entity.name.type.property.wla-dx-asm" }
+				}
+			},{
+				"include"	: "#exprs"
+			}]
+		},
+		"exprs"	: {
+			"patterns"	: [{
+				"include" : "#comments"
+			},{
+				"include" : "#strings"
+			},{
+				"include" : "#numbers"
+			},{
+				"include" : "#operators"
+			},{
+				"include" : "#symbols"
+			}]
+		},
+		"comments"	: {
+			"patterns"	: [{
+				"name"	: "comment.line.wla-dx-asm",
+				"begin" : "^\\*",
+				"end"	: "(?=\\n)"
+			},{
+				"name"  : "comment.wla-dx-asm",
+				"begin" : ";",
+				"end"   : "(?=\\n)"
+			},{
+				"name"	: "comment.block.wla-dx-asm",
+				"begin"	: "/\\*",
+				"end"	: "\\*/"
+			}]
+		},
+		"keywords"	: {
+			"patterns"	: [{
+				"name"		: "keyword.wla-dx-asm",
+				"match"		: "(?<=^|\\W)\\.(?i:(?:8|16|24)BIT|ACCU|ADDR|ASC|BACKGROUND|BASE|BR(?:EAKPOINT)?|BYTE?|CARTRIDGETYPE|COMPUTE(?:GB|SMS|SNES)CHECKSUM|COMPUTEGBCOMPLEMENTCHECK|COUNTRYCODE|DATA|DBCOS|DBSIN|DBRND|DEF(?:INE)?|DESTINATIONCODE|D(?:B|SB?|WB?)|DWCOS|DWSIN|DWRND|EMPTYFILL|EQU|EXPORT|F(?:ARADDR|ASTROM|CLOSE|OPEN|READ|SIZE)|HIROM|INDEX|LICENSEECODE(?:NEW|OLD)|NAME|NINTENDOLOGO|RAMSIZE|REDEF(?:INE)?|ROM(?:BANKS|DMG|GBC(?:ONLY)?|SGB)|ROW|SDSCTAG|SEED|SLOWROM|SMC|SMSTAG|SYM(?:BOL)?|UN(?:BACKGROUND|DEF(?:INE)?)|WORD)\\b"
+			},{
+				"name"		: "keyword.control.wla-dx-asm",
+				"match"		: "(?<=^|\\W)\\.(?i:D[BW]M|ELSE|END(?:IF|R)|FAIL|INC(?:DIR|LUDE)?|IF(?:LE(?:EQ)?|GR(?:EQ)?|N?(?:DEFM?|EQ)|EXISTS)?|INPUT|ORGA?|OUTNAME|PRINT[TV]?|REP(?:EAT)?|SLOT)\\b"
+			},{
+				"name"		: "invalid.deprecated",
+				"match"		: "(?<=^|\\W)\\.(?i:COMPUTE(?:CHECKSUM|COMPLEMENTCHECK))\\b"
+			},{
+				"begin"		: "(?<=^|\\W)(?i)(\\.INCBIN)\\b",
+				"beginCaptures"	: {
+					"1" : { "name" : "keyword.control.wla-dx-asm" }
+				},
+				"end"		: "\\n",
+				"patterns"	: [{
+					"name"	: "support.type.property-name.wla-dx-asm",
+					"match"	: "\\b(?i:FILTER|FSIZE|READ|SKIP|SWAP)\\b"
+				},{
+					"include"	: "#exprs"
+				}]
+			},{
+				"match"		: "(?<=^|\\W)(?i)(\\.BANK)\\s+(\\d+)(?:\\s+(SLOT))?",
+				"captures"	: {
+					"1" 	: { "name" : "keyword.wla-dx-asm" },
+					"2" 	: { "name" : "constant.numeric" },
+					"3" 	: { "name" : "support.type.property-name.wla-dx-asm" }
+				}
+			},{
+				"name"		: "meta.type.struct.wla-dx-asm",
+				"begin"		: "(?<=^|\\W)(?i)(\\.STRUCT)\\b",
+				"end"		: "(?<=^|\\W)(?i)(\\.ENDST)\\b",
+				"captures"	: {
+					"1"		: { "name": "storage.type.struct.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"include"	: "#struct"
+				}]
+			},{
+				"begin"		: "(?<=^|\\W)(?i)(\\.TABLE)\\b",
+				"beginCaptures"	: {
+					"1" : { "name" : "keyword.control.wla-dx-asm" }
+				},
+				"end"		: "\\n",
+				"patterns"	: [{
+					"name"	: "storage.type.wla-dx-asm",
+					"match"	: "\\b(?i:ADDR|BYTE?|D[BLW]|DS[BLW]?|FARADDR|LONG|WORD)\\b"
+				},{
+					"include"	: "#exprs"
+				}]
+			},{
+				"begin"		: "(?<=^|\\W)(?i)(\\.ENUMID)\\b",
+				"beginCaptures"	: {
+					"1" : { "name" : "keyword.control.wla-dx-asm" }
+				},
+				"end"		: "\\n",
+				"patterns"	: [{
+					"name"	: "support.type.property-name.wla-dx-asm",
+					"match"	: "\\b(?i:EXPORT|STEP)\\b"
+				},{
+					"include"	: "#exprs"
+				}]
+			},{
+				"name"		: "meta.type.enum.wla-dx-asm",
+				"begin"		: "(?<=^|\\W)(?i)(\\.ENUM)\\b",
+				"end"		: "(?<=^|\\W)(?i)(\\.ENDE)\\b",
+				"captures"	: {
+					"1"		: { "name": "storage.type.enum.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"name"  : "support.type.property-name.wla-dx-asm",
+					"match" : "\\b(?i:ASC|DESC|EXPORT)\\b"
+				},{
+					"include"	: "#struct"
+				}]
+			},{
+				"name"		: "meta.type.enum.ram.wla-dx-asm",
+				"begin"		: "(?<=^|\\W)(?i)(\\.RAMSECTION)\\b",
+				"end"		: "(?<=^|\\W)(?i)(\\.ENDS)\\b",
+				"captures"	: {
+					"1"		: { "name": "storage.type.enum.ram.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"name"  : "support.type.property-name.wla-dx-asm",
+					"match"	: "\\b(?i:ALIGN|BANK|FORCE|ORGA?|RETURNORG|SLOT)\\b"
+				},{
+					"include" : "#struct"
+				}]
+			},{
+				"name" 		: "meta.type.memmap.wla-dx-asm",
+				"begin"		: "(?<=^|\\W)(?i)(\\.MEMORYMAP)\\b",
+				"end"		: "(?<=^|\\W)(?i)(\\.ENDME)\\b",
+				"captures"	: {
+					"1" 	: { "name": "storage.type.memmap.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"name"	: "support.type.property-name.wla-dx-asm",
+					"match"	: "\\b(?i:DEFAULTSLOT|SLOT(?:SIZE)?|START|SIZE)\\b" 
+				},{
+					"include"	: "#exprs"
+				}]
+			},{
+				"name" 		: "meta.type.rombanks.wla-dx-asm",
+				"begin"		: "(?<=^|\\W)(?i)(\\.ROMBANKMAP)\\b",
+				"end"		: "(?<=^|\\W)(?i)(\\.ENDRO)\\b",
+				"captures"	: {
+					"1" 	: { "name": "storage.type.rombanks.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"name"	: "support.type.property-name.wla-dx-asm",
+					"match"	: "\\b(?i:BANKS(?:IZE|TOTAL)?)\\b" 
+				},{
+					"include"	: "#exprs"
+				}]
+			},{
+				"name"		: "meta.type.asciitable.wla-dx-asm",
+				"begin"		: "(?<=^|\\W)(?i)(\\.ASC(?:II)?TABLE)\\b",
+				"end"		: "(?<=^|\\W)(?i)(\\.ENDA)\\b",
+				"captures"	: {
+					"1"		: { "name": "storage.type.asciitable.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"name" 	: "support.type.property-name.wla-dx-asm",
+					"match" : "\\b(?i:MAP)\\b"
+				},{
+					"name"  : "support.type.property-name.wla-dx-asm",
+					"match" : "\\b(?i:TO)\\b"
+				},{
+					"include"	: "#exprs"
+				}]
+			},{
+				"name"		: "meta.type.header.gb.wla-dx-asm",
+				"begin"		: "(?<=^|\\W)(?i)(\\.GBHEADER)\\b",
+				"end"		: "(?<=^|\\W)(?i)(\\.ENDGB)\\b",
+				"captures"	: {
+					"1"		: { "name": "storage.type.header.gb.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"name"	: "support.type.property-name.wla-dx-asm",
+					"match"	: "\\b(?i:NAME|LICENSEECODEOLD|LICENSEECODENEW|CARTRIDGETYPE|RAMSIZE|COUNTRYCODE|DESTINATIONCODE|NINTENDOLOGO|ROMDMG|ROMGBC|ROMGBCONLY)\\b"
+				},{
+					"include"	: "#exprs"
+				}]
+			},{
+				"name"		: "meta.type.snes.vector.native.wla-dx-asm",
+				"begin"		: "(?<=^|\\W)(?i)(\\.SNESNATIVEVECTOR)\\b",
+				"end"		: "(?<=^|\\W)(?i)(\\.ENDNATIVEVECTOR)\\b",
+				"captures"	: {
+					"1"		: { "name": "storage.type.snes.vector.native.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"name"	: "support.type.property-name.wla-dx-asm",
+					"match"	: "\\b(?i:COP|BRK|ABORT|NMI|UNUSED|IRQ)\\b"
+				},{
+					"include"	: "#exprs"
+				}]
+			},{
+				"name"		: "meta.type.snes.vector.emu.wla-dx-asm",
+				"begin"		: "(?<=^|\\W)(?i)(\\.SNESEMUVECTOR)\\b",
+				"end"		: "(?<=^|\\W)(?i)(\\.ENDEMUVECTOR)\\b",
+				"captures"	: {
+					"1"		: { "name": "storage.type.snes.vector.emu.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"name"	: "support.type.property-name.wla-dx-asm",
+					"match"	: "\\b(?i:COP|UNUSED|ABORT|NMI|RESET|IRQBRK)\\b"
+				},{
+					"include"	: "#exprs"
+				}]
+			},{
+				"name"		: "meta.type.header.sms.wla-dx-asm",
+				"begin"		: "(?<=^|\\W)(?i)(\\.SMSHEADER)\\b",
+				"end"		: "(?<=^|\\W)(?i)(\\.ENDSMS)\\b",
+				"captures"	: {
+					"1"		: { "name": "storage.type.header.sms.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"name"	: "support.type.property-name.wla-dx-asm",
+					"match"	: "^\\b(?i:PRODUCTCODE|VERSION|REGIONCODE|RESERVEDSPACE)\\b"
+				},{
+					"include"	: "#exprs"
+				}]
+			},{
+				"name"		: "meta.type.header.snes.wla-dx-asm",
+				"begin"		: "(?<=^|\\W)(?i)(\\.SNESHEADER)\\b",
+				"end"		: "(?<=^|\\W)(?i)(\\.ENDSNES)\\b",
+				"captures"	: {
+					"1"		: { "name": "storage.type.header.snes.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"name"	: "support.type.property-name.wla-dx-asm",
+					"match"	: "\\b(?i:ID|NAME|LOROM|HIROM|SLOWROM|FASTROM|CARTRIDGETYPE|ROMSIZE|SRAMSIZE|COUNTRY|LICENSECODE|VERSION)\\b"
+				},{
+					"include"	: "#exprs"
+				}]
+			},{
+				"name"		: "meta.type.macro.wla-dx-asm",
+				"begin"		: "(?<=^|\\W)(?i)(\\.MACRO)\\b",
+				"end"		: "(?<=^|\\W)(?i)(\\.ENDM)\\b",
+				"captures"	: {
+					"1"		: { "name": "storage.type.macro.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"include"	: "#root"
+				}]
+			},{
+				"name"		: "meta.type.wla-dx-asm",
+				"begin"		: "(?<=^|\\W)(?i)(\\.BLOCK)\\b",
+				"end"		: "(?<=^|\\W)(?i)(\\.ENDB)\\b",
+				"captures"	: {
+					"1"		: { "name": "storage.type.block.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"include"	: "#root"
+				}]
+			},{
+				"name" 		: "meta.type.struct.wla-dx-asm",
+				"begin"		: "(?<=^|\\W)(?i)(\\.DSTRUCT)\\s+([A-Z0-9_]+)(?:(,)|\\s+(INSTANCEOF))\\s+([A-Z0-9_]+)(?:\\s+(DATA))?",
+				"captures"	: {
+					"1"		: { "name": "keyword.wla-dx-asm" },
+					"2"		: { "name": "entity.name.type.wla-dx-asm" },
+					"3"		: { "name": "punctuation.separator.wla-dx-asm" },
+					"4"		: { "name": "support.type.property-name.wla-dx-asm" },
+					"5"		: { "name": "entity.name.type.wla-dx-asm" },
+					"6"		: { "name": "support.type.property-name.wla-dx-asm" }
+				},
+				"end"		: "\\n",
+				"patterns" 	: [{
+					"include"	: "#exprs"
+				}]
+			}]
+		},
+		"mnemonics"	: {
+			"comment"	: "Processor mnemonics",
+			"patterns"	: [{
+				"match"		: "(?<=\\s)(?i)(ad[cd]|and|asl|bbr[0-7]|bc[cs]|beq|bit|bmi|bne|bpl|bra|bv[cs]|brk|ccf|cl[cdiv]|cmp|cp(?:l|dr?|ir?|[xy])?|daa|de[acxy]|di|djnz|ei|eor|exx?|halt|im|in[acxy]|in(?:dr?|ir?)|jmp|jsr|ld(?:[axy]|dr?|ir?)?|lsr|neg|nop|ora?|ot[di]r|out[di]?|ph[apxy]|pl[apxy]|pop|push|res|ret[in]|r[lr](?:a|ca?|d)?|rmb[0-7]|ro[lr]|rst|rt[is]|sbc|scf|se[cdit]|sla|smb[0-7]|sr[al]|st[axyz]|sto?p|sub|swap|ta[xy]|tsx|t[rs]b|tx[as]|tya|wai|xor)(\\.[bwl])?\\b",
+				"captures"	: {
+					"1" 	: { "name" : "support.function.wla-dx-asm" },
+					"2" 	: { "name" : "storage.modifier.wla-dx-asm" }
+				}
+			},{
+				"comment"	: "Undocumented / illegal mnemonics, for CPUs that have them",
+				"match"		: "(?<=\\s)(?i)(ahx|alr|anc|arr|axs|dcp|hlt|isc|jam|kil|la[sx]|rla|rra|sax|sh[xy]|slo|sre|tas|xaa)(\\.[bwl])?\\b",
+				"captures"	: {
+					"1" 	: { "name" : "support.function.illegal.wla-dx-asm" },
+					"2" 	: { "name" : "storage.modifier.wla-dx-asm" }
+				}
+			},{
+				"match"		: "(?<=\\s)(?i)(sll)(\\.[bwl])?\\b",
+				"captures"	: {
+					"1" 	: { "name" : "invalid.illegal.wla-dx-asm" },
+					"2" 	: { "name" : "storage.modifier.wla-dx-asm" }
+				}
+			},{
+				"match"		: "(?<=\\s)(?i)(jr)(?:\\s+(n?[cz]))?\\b",
+				"captures"	: {
+					"1" 	: { "name" : "support.function.wla-dx-asm" },
+					"2" 	: { "name" : "support.constant" }
+				}
+			},{
+				"match"		: "(?<=\\s)(?i)(call|jp|ret)(?:\\s+(n?z|n?c|m|p[oe]?))?\\b",
+				"captures"	: {
+					"1" 	: { "name" : "support.function.wla-dx-asm" },
+					"2" 	: { "name" : "support.constant" }
+				}
+			}]
+		},
+		"symbols"	: {
+			"patterns"	: [{
+				"name"		: "support.variable.register.shadow.wla-dx-asm",
+				"comment"	: "Z80 shadow registers.",
+				"match"		: "(?<=\\W)(?:AF?|BC?|C|DE?|E|HL?|L)'"
+			},{
+				"name"		: "support.variable.register.wla-dx-asm",
+				"comment"	: "Z80 registers.",
+				"match"		: "(?<=\\W)(?:AF?|BC?|C|DE?|E|HL?|L|[IR]|IX[HL]?|IY[HL]?|SP)\\b"
+			},{
+				"name"		: "support.variable.register.wla-dx-asm",
+				"comment"	: "6502/6510/65C02 registers.",
+				"match"		: "(?<=\\W)(?i:a|x|y)\\b"
+			},{
+				"name" 		: "support.variable",
+				"match" 	: "(?<=\\W)(?i)_out\\b"
+			},{
+				"name" 		: "support.constant",
+				"comment"	: "Pre-defined WLA-DX constants.",
+				"match" 	: "(?<=\\W)(CADDR|WLA_(?:FILENAME|TIME|VERSION))\\b"
+			},{
+				"name" 		: "support.constant",
+				"comment"	: "Macro replacement symbols.",
+				"match" 	: "(?<=\\W)\\\\(?:[0-9.!]|\\\\@(?:[+-]\\d)?)\\b"
+			},{
+				"name" 		: "constant",
+				"comment"	: "Constants are assumed to be all-caps.",
+				"match" 	: "(?<=\\W)([A-Z][A-Z0-9_]+)\\b"
+			},{
+				"match" 	: "(?<=\\W)(?i)([A-Z][A-Z0-9_]+)((?:\\.[A-Z0-9_]+)+)\\b",
+				"captures"	: {
+					"1"		: { "name" : "entity.name.type" },
+					"2"		: { "name" : "entity.name.type.property" }
+				}
+			},{
+				"match" 	: "(?<=^|\\W)(?i)((?:[A-Z_]|(\\\\[0-9.!]|\\\\@(?:[+-]\\d)?))(?:[A-Z0-9_]+|(\\\\[0-9.!]|\\\\@(?:[+-]\\d)?))*)((?:@(?:[A-Z_]|(\\\\[0-9.!]|\\\\@(?:[+-]\\d)?))(?:[A-Z0-9_]+|(\\\\[0-9.!]|\\\\@(?:[+-]\\d)?))*)+)\\b",
+				"captures" 	: {
+					"1"		: { "name" : "entity.name.function.wla-dx-asm" },
+					"2"		: { "name" : "support.constant.wla-dx-asm" },
+					"3"		: { "name" : "support.constant.wla-dx-asm" },
+					"4"		: {	"name" : "entity.name.method.wla-dx-asm" },
+					"5"		: { "name" : "support.constant.wla-dx-asm" },
+					"6"		: { "name" : "support.constant.wla-dx-asm" }
+				}
+			},{
+				"name"		: "entity.name.function.wla-dx-asm",
+				"match" 	: "(?<=^|\\W)(?i)(?:[A-Z_]|(\\\\[0-9.!]|\\\\@(?:[+-]\\d)?))(?:[A-Z0-9_]+|(\\\\[0-9.!]|\\\\@(?:[+-]\\d)?))*(:)?",
+				"captures"	:  {
+					"1"		: { "name"	: "support.constant" },
+					"2"		: { "name"	: "support.constant" }
+				}
+			},{
+				"name" 		: "entity.name.method.wla-dx-asm",
+				"match" 	: "(?<=^|\\W)(?:@+)(?i)(?:[A-Z_]|(\\\\[0-9.!]|\\\\@(?:[+-]\\d)?))(?:[A-Z0-9_]+|(\\\\[0-9.!]|\\\\@(?:[+-]\\d)?))*(:)?",
+				"captures"	: {
+					"1"		: { "name"	: "support.constant" },
+					"2"		: { "name"	: "support.constant" }
+				}
+			},{
+				"name"		: "entity.name.function.macro.wla-dx-asm",
+				"match"		: "(?<=^|\\W)(?i:\\.(?!ENDASM)[A-Z0-9_]+)+\\b"
+			}]
+		},
+		"strings"	: {
+			"patterns"	: [{
+				"name"		: "string.quoted.single.wla-dx-asm",
+				"comment"	: "Single character value",
+				"match"		: "'.'"
+			},{
+				"name"		: "string.quoted.double.wla-dx-asm",
+				"begin"		: "\"",
+				"end"		: "\"(.length)?",
+				"endCaptures": {
+					"1"		: { "name" : "string.storage.modifier.string.wla-dx-asm" }
+				},
+				"patterns"	: [{
+					"name"	: "constant.character.escape.wla-dx-asm",
+					"match"	: "\\\\."
+				}]
+			}]
+		},
+		"numbers"	: {
+			"patterns"	: [{
+				"comment"	: "Hexadecimal number: '$...'",
+				"match"		: "(?i)([#!]\\s*)?(\\$[0-9A-F]{1,16})(\\.[lbw])?\\b",
+				"captures" 	: {
+					"1" 	: { "name" : "storage.modifier.wla-dx-asm" },
+					"2" 	: { "name" : "constant.numeric.hexadecimal.wla-dx-asm" },
+					"3" 	: { "name" : "storage.modifier.wla-dx-asm" }
+				}
+			},{
+				"comment"	: "Hexadecimal number: '...h'",
+				"match" 	: "(?i)([#!]\\s*)?([0-9][0-9A-F]*h)(\\.[lbw])?\\b",
+				"captures" 	: {
+					"1" 	: { "name" : "storage.modifier.wla-dx-asm" },
+					"2" 	: { "name" : "constant.numeric.hexadecimal.wla-dx-asm" },
+					"3" 	: { "name" : "storage.modifier.wla-dx-asm" }
+				}
+			},{
+				"match" 	: "(?i)([#!]\\s*)?(%[01]{1,32})(\\.[lbw])?\\b",
+				"captures" 	: {
+					"1" 	: { "name" : "storage.modifier.wla-dx-asm" },
+					"2" 	: { "name" : "constant.numeric.binary.wla-dx-asm" },
+					"3" 	: { "name" : "storage.modifier.wla-dx-asm" }
+				}
+			},{
+				"match" 	: "(?i)([#!]\\s*)?((?:[0-9]|[1-9][0-9]*)(?:\\.[0-9]+)?)(\\.[lbw])?\\b",
+				"captures" 	: {
+					"1" 	: { "name" : "storage.modifier.wla-dx-asm" },
+					"2" 	: { "name" : "constant.numeric.decimal.wla-dx-asm" },
+					"3" 	: { "name" : "storage.modifier.wla-dx-asm" }
+				}
+			},{
+				"match"		: "(?i)([#!]\\s*)?(\\'.\\')(\\.[lbw])?\\b",
+				"captures" 	: {
+					"1" 	: { "name" : "storage.modifier.wla-dx-asm" },
+					"2" 	: { "name" : "string.quoted.single.wla-dx" },
+					"3" 	: { "name" : "storage.modifier.wla-dx-asm" }
+				}
+			}]
+		},
+		"operators"	: {
+			"patterns"	: [{
+				"name"	: "punctuation.separator.wla-dx-asm",
+				"match" : ","
+			},{
+				"name"  : "keyword.operator.assignment.wla-dx-asm",
+				"match" : "="
+			},{
+				"name"  : "keyword.operator.arithmetic.wla-dx-asm",
+				"match" : "\\+"
+			},{
+				"name"  : "keyword.operator.arithmetic.wla-dx-asm",
+				"match" : "-"
+			},{
+				"name"  : "keyword.operator.arithmetic.wla-dx-asm",
+				"match" : "\\*"
+			},{
+				"name"  : "keyword.operator.arithmetic.wla-dx-asm",
+				"match" : "\\^"
+			},{
+				"name"  : "keyword.operator.arithmetic.wla-dx-asm",
+				"match" : "/"
+			},{
+				"name"  : "keyword.operator.bitwise.wla-dx-asm",
+				"match" : "&" 
+			},{
+				"name"  : "keyword.operator.bitwise.wla-dx-asm",
+				"match" : "\\|"
+			},{
+				"name"  : "keyword.operator.bitwise.wla-dx-asm",
+				"match" : "~"
+			},{
+				"name"  : "keyword.operator.bitwise.wla-dx-asm",
+				"match" : "<<"
+			},{
+				"name"  : "keyword.operator.bitwise.wla-dx-asm",
+				"match" : ">>"
+			},{
+				"name"  : "keyword.operator.bitwise.wla-dx-asm",
+				"match" : "<"
+			},{
+				"name"  : "keyword.operator.bitwise.wla-dx-asm",
+				"match" : ">"
+			},{
+				"name"  : "punctuation.parens.begin.round.wla-dx-asm",
+				"match" : "\\("
+			},{
+				"name"  : "punctuation.parens.end.round.wla-dx-asm",
+				"match" : "\\)"
+			},{
+				"name"  : "punctuation.parens.begin.square.wla-dx-asm",
+				"match" : "\\["
+			},{
+				"name"  : "punctuation.parens.end.square.wla-dx-asm",
+				"match" : "\\]"
+			}]
+		}
+	},
+	"scopeName"	: "source.wla-dx-asm"
+}
