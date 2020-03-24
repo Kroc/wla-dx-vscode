@@ -6,6 +6,10 @@
         "email": "kroc@camendesign.com",
         "url": "http://camendesign.com"
     },
+    "license": "mit",
+    "repository": {
+        "url": "https://github.com/Kroc/wla-dx-vscode"
+    },
     "displayName": "WLA-DX for VSCode",
     "description": "VSCode language support for WLA-DX assembler; WLA DX - Yet Another GB-Z80/Z80/6502/65C02/65CE02/6510/65816/6800/6801/6809/8008/8080/HUC6280/SPC-700 Multi Platform Cross Assembler Package",
     "version": "0.1.0",
